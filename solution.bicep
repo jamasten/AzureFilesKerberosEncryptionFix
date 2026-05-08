@@ -70,8 +70,7 @@ module roleAssignment_storageAccountContributor 'modules/role-assignments/resour
   name: 'assign-role-storage-${deploymentNameSuffix}'
   params: {
     principalId: userAssignedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: '17d1049b-9a84-46fb-8f53-869881c3d3ab'
+    roleDefinitionId: '17d1049b-9a84-46fb-8f53-869881c3d3ab' // Storage Account Contributor
   }
 }
 
@@ -217,6 +216,9 @@ resource extension_JsonADDomainExtension 'Microsoft.Compute/virtualMachines/exte
       Password: domainAdminPassword
     }
   }
+  dependsOn: [
+    extension_GuestAttestation
+  ]
 }
 
 module roleAssignment_virtualMachineContributor 'modules/role-assignments/virtual-machine.bicep' = {
@@ -284,6 +286,9 @@ resource runCommand_kerberosEncryption 'Microsoft.Compute/virtualMachines/runCom
     }
     treatFailureAsDeploymentFailure: true
   }
+  dependsOn: [
+    extension_JsonADDomainExtension
+  ]
 }
 
 resource runCommand_cleanUp 'Microsoft.Compute/virtualMachines/runCommands@2023-09-01' = {
