@@ -83,13 +83,14 @@ $Description = "Computer account object for Azure storage account $($StorageAcco
 $OldComputerObject = Get-ADComputer -Credential $DomainCredential -Filter {Name -eq $StorageAccountName}
 if ($OldComputerObject)
 {
-    Remove-ADComputer -Credential $DomainCredential -Identity $StorageAccountName -Confirm:$false
+    $OldComputerObject | Remove-ADObject -Credential $DomainCredential -Recursive -Confirm:$false
 }
 
+$SamAccountName = if($StorageAccountName.Length -gt 19) { $StorageAccountName.Substring(0, 19) } else { $StorageAccountName }
 if ($OrganizationalUnitPath) {
-    $NewComputerObject = New-ADComputer -Credential $DomainCredential -Name $StorageAccountName -Path $OrganizationalUnitPath -ServicePrincipalNames $SPN -AccountPassword $ComputerPassword -Description $Description -PassThru
+    $NewComputerObject = New-ADComputer -Credential $DomainCredential -Name $StorageAccountName -SamAccountName $SamAccountName -Path $OrganizationalUnitPath -ServicePrincipalNames $SPN -AccountPassword $ComputerPassword -Description $Description -PassThru
 } else {
-    $NewComputerObject = New-ADComputer -Credential $DomainCredential -Name $StorageAccountName -ServicePrincipalNames $SPN -AccountPassword $ComputerPassword -Description $Description -PassThru
+    $NewComputerObject = New-ADComputer -Credential $DomainCredential -Name $StorageAccountName -SamAccountName $SamAccountName -ServicePrincipalNames $SPN -AccountPassword $ComputerPassword -Description $Description -PassThru
 }
 
 $Body = (@{
